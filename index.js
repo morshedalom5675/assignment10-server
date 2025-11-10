@@ -1,7 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const app = express();
 const port = 3000;
 
@@ -30,6 +30,40 @@ async function run() {
   try {
     
     await client.connect();
+
+    const db = client.db('assignment10_DB')
+    const issueCollection = db.collection('issue')
+
+    // all issue get
+    app.get('/issue',async (req, res) => {
+      const result = await issueCollection.find().sort({date:-1}).toArray()
+      res.send(result)
+    })
+
+
+    // latest issue get
+    app.get('/latest-issue', async (req, res) => {
+      const result = await issueCollection.find().limit(6).sort({date:-1}).toArray()
+      res.send(result)
+    })
+
+
+    // single issue get
+    app.get('/issue/:id', async (req, res) => {
+      const id = req.params.id
+      const objectId = new ObjectId(id)
+      const result = await issueCollection.findOne({_id:objectId})
+      res.send(result)
+    })
+
+
+
+    // single data post 
+    app.post('/issue', async (req, res) => {
+      const data = req.body
+      const result = await issueCollection.insertOne(data)
+      res.send(result)
+    })
     
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
