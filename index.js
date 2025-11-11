@@ -34,8 +34,30 @@ async function run() {
     const contributesCollection = db.collection("contributes");
 
     // all issue get
+    // app.get("/issue", async (req, res) => {
+    //   const result = await issueCollection.find().sort({ date: -1 }).toArray();
+    //   res.send(result);
+    // });
+
+    // logged user report issue get
+    // app.get("/issue", async (req, res) => {
+    //   const email = req.query.email;
+    //   const query = { email: email };
+    //   const result = await issueCollection.find(query).toArray();
+    //   res.send(result);
+    // });
+
+    // all issue and logged user issue
     app.get("/issue", async (req, res) => {
-      const result = await issueCollection.find().sort({ date: -1 }).toArray();
+      const email = req.query.email;
+      let query = {};
+      if (email) {
+        query = { email: email };
+      }
+      const result = await issueCollection
+        .find(query)
+        .sort({ date: -1 })
+        .toArray();
       res.send(result);
     });
 
@@ -74,20 +96,23 @@ async function run() {
     });
 
     // issue contribution table
-    app.get('/issue/contributes/:issueId', async(req, res) => {
-      const issueId = req.params.issueId
-      const query = { issue: issueId }
-      const cursor =  contributesCollection.find(query).sort({date:-1}) 
-      const result = await cursor.toArray()
-      res.send(result)
-    })
+    app.get("/issue/contributes/:issueId", async (req, res) => {
+      const issueId = req.params.issueId;
+      const query = { issue: issueId };
+      const cursor = contributesCollection.find(query).sort({ date: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
 
     // logged user issues contribution
     app.get("/contributes", async (req, res) => {
-      const query = {};
-      if (query.email) {
-        query.contributor_email = email;
+      const email = req.query.email;
+
+      let query = {};
+      if (email) {
+        query = { contributor_email: email };
       }
+
       const result = await contributesCollection.find(query).toArray();
       res.send(result);
     });
