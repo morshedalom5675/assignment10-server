@@ -86,6 +86,26 @@ async function run() {
       res.send(result);
     });
 
+    // update issue
+    app.put('/issue/:id', async (req, res) => {
+      const id = req.params.id
+      const data = req.body
+      console.log(id)
+      console.log(data)
+      const objectId = new ObjectId(id);
+      // const result = await issueCollection.updateOne()
+      res.send({success:true})
+      
+    })
+
+    // delete issue
+    app.delete('issue/:id', async(req, res) => {
+      const id = req.params.id
+      const objectId = new ObjectId(id)
+      const result = await issueCollection.deleteOne({_id:objectId})
+      res.send(result)
+    })
+
     // contribute collection api
 
     // single contribute post
